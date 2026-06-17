@@ -121,12 +121,12 @@
 </header>
 
 <main id="page-home" class="max-w-7xl mx-auto px-5 md:px-10 py-10 md:py-14">
+  <!-- ✨ แก้แล้ว: ลบ "สไตล์มินิมอล ✨" ออก -->
   <div class="greeting-card mb-8 slide-up">
     <div class="flex items-center gap-3">
       <div style="font-size:28px;" class="heart-float">🛍️</div>
       <div>
         <div style="font-weight:500; font-size:15px;">ยินดีต้อนรับสู่ RONXZ STUDIO</div>
-        <div class="text-muted" style="font-weight:400; font-size:12px;">เสื้อผ้ามือสองคัดสภาพ สไตล์มินิมอล ✨</div>
       </div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
@@ -298,7 +298,7 @@
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
       <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">📦 สินค้าทั้งหมด</div><div class="text-3xl" id="statTotal" style="font-weight:500;">0</div></div>
-      <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">✨ พร้อมขาย</div><div class="text-3xl text-green-400" id="statAvailable" style="font-weight:500;">0</div></div>
+      <divdiv class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">✨ พร้อมขาย</div><div class="text-3xl text-green-400" id="statAvailable" style="font-weight:500;">0</div></div>
       <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">💔 ขายแล้ว</div><div class="text-3xl text-red-400" id="statSold" style="font-weight:500;">0</div></div>
       <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">👁 ยอดเข้าชม</div><div class="text-3xl" id="statViews" style="font-weight:500;">0</div></div>
     </div>
@@ -330,7 +330,6 @@
 <div id="toast" class="toast"></div>
 
 <script>
-/* 🔥 FIREBASE CONFIG - ใส่ของคุณแล้ว! */
 const firebaseConfig = {
   apiKey: "AIzaSyAHfkknk8XynqS6P9whg8Pax1oXDU01Qjc",
   authDomain: "ronxz-studio.firebaseapp.com",
@@ -350,6 +349,7 @@ let editingId = null;
 let newImageUrls = [];
 let currentFilter = 'all';
 let currentUser = null;
+let isFirstLoad = true; // 🔥 แก้บัคกระพริบ
 
 let zoomState = { scale: 1, x: 0, y: 0 };
 let zoomDragging = false;
@@ -364,13 +364,35 @@ const defaultProducts = [
   { name:'Silver Chain Necklace', price:390, status:'available', category:'เครื่องประดับ', size:'50cm', condition:'9/10', flaw:'ไม่มี', desc:'สร้อยคอเงิน Stainless', images:['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800'], views:0 }
 ];
 
+// 🔥 แก้บัคกระพริบ: แยกการ render และ update views
 function listenProducts(){
   db.collection('products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    const wasEmpty = products.length === 0;
     products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    if(products.length === 0 && snapshot.metadata.fromCache === false){ addDefaultProducts(); return; }
+    
+    if(products.length === 0 && snapshot.metadata.fromCache === false){
+      addDefaultProducts();
+      return;
+    }
+    
     document.getElementById('loadingState').classList.add('hidden');
-    renderProducts();
-    if(!document.getElementById('adminPanel').classList.contains('hidden')){ renderAdminList(); updateStats(); }
+    
+    // ถ้าเป็น first load หรือมีการเปลี่ยนแปลงจริงๆ → render
+    // ไม่ render ทุกครั้งที่ views เปลี่ยน (กันกระพริบ)
+    const isStructureChange = snapshot.docChanges().some(change => 
+      change.type === 'added' || change.type === 'removed'
+    );
+    
+    if(isFirstLoad || isStructureChange || wasEmpty){
+      renderProducts();
+      isFirstLoad = false;
+    }
+    
+    // อัปเดต admin panel เสมอ (เพราะ stats ต้องอัปเดต)
+    if(!document.getElementById('adminPanel').classList.contains('hidden')){
+      renderAdminList();
+      updateStats();
+    }
   }, (error) => {
     console.error('Firestore error:', error);
     showToast('❌ ' + error.message);
@@ -405,12 +427,12 @@ function adminLogin(){
   const pass = document.getElementById('adminPass').value;
   const btn = document.getElementById('adminLoginBtn');
   if(!email || !pass){ showToast('⚠️ กรุณากรอก Email และ Password'); return; }
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> กำลังเข้าสู่ระบบ...';
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> กำลังเข้าสู่ระบม...';
   auth.signInWithEmailAndPassword(email, pass).then((uc) => { currentUser = uc.user; closeAdminLogin(); openAdminPanel(); showToast('✨ เข้าสู่ระบบสำเร็จ'); btn.disabled = false; btn.innerHTML = '✨ เข้าสู่ระบบ'; }).catch((error) => {
     let msg = '❌ เข้าสู่ระบบไม่สำเร็จ';
     if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') msg = '❌ Email หรือ Password ไม่ถูกต้อง';
     if(error.code === 'auth/user-not-found') msg = '❌ ไม่พบผู้ใช้นี้';
-    showToast(msg); btn.disabled = false; btn.innerHTML = '✨ เข้าสู่ระบบ';
+    showToast(msg); btn.disabled = false; btn.innerHTML = '✨ เข้าสู่ระบม';
   });
 }
 document.getElementById('adminPass').addEventListener('keypress', (e)=>{ if(e.key === 'Enter') adminLogin(); });
