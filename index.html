@@ -5,90 +5,288 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>RONXZ STUDIO — Vintage & Streetwear</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{ --bg:#0A0A0A; --card:#111111; --text:#ffffff; --muted:#A1A1A1; --line:rgba(255,255,255,0.08); }
+  :root{
+    --bg:#0A0A0A;
+    --card:#111111;
+    --text:#ffffff;
+    --muted:#A1A1A1;
+    --line:rgba(255,255,255,0.08);
+    --pink:#FFE4E1;
+  }
   *{ -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-  html,body{ background:var(--bg); color:var(--text); font-family:'Mali',cursive; font-weight:400; margin:0; padding:0; }
-  body{ background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px); background-size:28px 28px; min-height:100vh; }
+  html,body{ background:var(--bg); color:var(--text); font-family:'Kanit',sans-serif; font-weight:400; margin:0; padding:0; font-size: 16px; }
+  body{
+    background-image: 
+      radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px),
+      radial-gradient(circle, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 28px 28px, 14px 14px;
+    background-position: 0 0, 7px 7px;
+    min-height: 100vh;
+  }
   .text-muted{ color:var(--muted); }
   .bg-card{ background:var(--card); }
   .border-line{ border-color:var(--line); }
-  .nav-link{ position:relative; padding:6px 2px; transition:color .25s ease; cursor:pointer; }
-  .nav-link::after{ content:""; position:absolute; left:0; bottom:0; height:2px; width:0; background:#fff; transition:width .3s ease; border-radius:2px; }
+  .nav-link{ position:relative; padding:6px 2px; transition:color .25s ease; cursor:pointer; background:none; border:none; color:#fff; }
+  .nav-link::after{
+    content:""; position:absolute; left:0; bottom:0; height:2px; width:0;
+    background:#fff; transition:width .3s ease; border-radius:2px;
+  }
   .nav-link:hover::after, .nav-link.active::after{ width:100%; }
   .product-card{ transition: transform .4s ease, box-shadow .4s ease; border-radius:18px; overflow:hidden; position:relative; }
   .product-card:hover{ transform: translateY(-8px) rotate(-0.3deg); box-shadow: 0 20px 50px rgba(0,0,0,.5); }
   .product-img{ transition: transform .7s ease; }
   .product-card:hover .product-img{ transform: scale(1.1) rotate(1deg); }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:14px 28px; border:1.5px solid #fff; color:#fff; background:transparent; font-size:12px; letter-spacing:.12em; text-transform:uppercase; transition:all .3s ease; cursor:pointer; font-family:'Mali',cursive; font-weight:500; border-radius:16px; }
+  .product-card::before{
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+    opacity:0; transition: opacity .5s ease; pointer-events:none; z-index:1;
+  }
+  .product-card:hover::before{ opacity:1; animation: shine 1s ease; }
+  @keyframes shine{ from{background-position:-100% 0;} to{background-position:200% 0;} }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+    padding:14px 28px; border:1.5px solid #fff; color:#fff; background:transparent;
+    font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    transition:all .3s cubic-bezier(.4,0,.2,1); cursor:pointer;
+    font-family:'Kanit',sans-serif; font-weight:500; border-radius:16px;
+    position:relative; overflow:hidden;
+  }
+  .btn::before{
+    content:''; position:absolute; top:50%; left:50%;
+    width:0; height:0; border-radius:50%;
+    background:rgba(255,255,255,0.2); transition:all .5s ease;
+    transform:translate(-50%,-50%);
+  }
+  .btn:hover::before{ width:300px; height:300px; }
   .btn:hover{ background:#fff; color:#000; }
   .btn-solid{ background:#fff; color:#000; }
   .btn-solid:hover{ background:transparent; color:#fff; }
-  .btn-ig{ background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); border:none; color:#fff; }
-  .btn-ig:hover{ filter:brightness(1.1); transform:translateY(-2px); }
-  .pill{ padding:8px 18px; border:1.5px solid var(--line); font-size:11px; letter-spacing:.08em; cursor:pointer; transition:all .25s ease; background:transparent; color:#fff; font-family:'Mali',cursive; font-weight:500; border-radius:30px; }
+  .btn-ig{
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    border:none; color:#fff;
+  }
+  .btn-ig:hover{ filter:brightness(1.1); transform:translateY(-2px); box-shadow:0 10px 30px rgba(220,39,67,.4); }
+  .pill{
+    padding:8px 18px; border:1.5px solid var(--line);
+    font-size:11px; letter-spacing:.08em; cursor:pointer;
+    transition:all .25s cubic-bezier(.4,0,.2,1); background:transparent; color:#fff;
+    font-family:'Kanit',sans-serif; font-weight:500; border-radius:30px;
+    position:relative; overflow:hidden;
+  }
   .pill:hover{ border-color:#fff; transform:translateY(-2px); }
-  .pill.active{ background:#fff; color:#000; border-color:#fff; }
-  .modal{ position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:80; display:none; align-items:center; justify-content:center; padding:20px; }
+  .pill.active{ background:#fff; color:#000; border-color:#fff; transform:scale(1.05); }
+  .modal{
+    position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:80;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
   .modal.open{ display:flex; }
   .thumb{ cursor:pointer; opacity:.4; transition:opacity .25s ease; border-radius:10px; overflow:hidden; }
   .thumb.active, .thumb:hover{ opacity:1; transform:scale(1.05); }
-  input, textarea, select{ background:rgba(255,255,255,0.03); border:1.5px solid var(--line); color:#fff; padding:11px 14px; font-size:14px; width:100%; outline:none; transition:all .25s ease; font-family:'Mali',cursive; font-weight:400; border-radius:14px; }
+  input, textarea, select{
+    background:rgba(255,255,255,0.03); border:1.5px solid var(--line); color:#fff;
+    padding:11px 14px; font-size:14px; width:100%; outline:none;
+    transition:all .25s ease; font-family:'Kanit',sans-serif; font-weight:400;
+    border-radius:14px;
+  }
+  input:hover, textarea:hover, select:hover{ border-color:rgba(255,255,255,0.25); }
   input:focus, textarea:focus, select:focus{ border-color:#fff; background:rgba(255,255,255,0.05); }
   select option{ background:#0A0A0A; color:#fff; }
   input::placeholder, textarea::placeholder{ color:rgba(255,255,255,0.3); }
   .fade-in{ animation: fadeIn .5s ease; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-  .slide-up{ animation: slideUp .7s ease; }
+  .slide-up{ animation: slideUp .7s cubic-bezier(.4,0,.2,1); }
   @keyframes slideUp{ from{opacity:0; transform:translateY(40px);} to{opacity:1; transform:translateY(0);} }
   .pulse-dot{ animation: pulse 1.6s ease-in-out infinite; }
-  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.4;} }
+  @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(1.2);} }
   .divider{ height:1px; background:var(--line); }
-  .sold-overlay{ position:absolute; inset:0; background:rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center; border-radius:18px; }
-  .toast{ position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(40px); background:#fff; color:#000; padding:14px 28px; font-size:12px; opacity:0; transition:all .4s ease; z-index:200; border-radius:16px; font-family:'Mali',cursive; font-weight:500; box-shadow: 0 15px 40px rgba(0,0,0,.5); }
+  .sold-overlay{
+    position:absolute; inset:0; background:rgba(0,0,0,.7);
+    display:flex; align-items:center; justify-content:center; border-radius:18px;
+  }
+  /* เพิ่มโค้ดนี้ลงไป */
+  .grayscale {
+    filter: grayscale(100%) contrast(0.3.5);
+    opacity: 0.2;
+    transition: all 0.4s ease;
+  }
+  .toast{
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(40px);
+    background:#fff; color:#000; padding:14px 28px; font-size:12px; letter-spacing:.05em;
+    opacity:0; transition:all .4s cubic-bezier(.4,0,.2,1); z-index:200; border-radius:16px;
+    font-family:'Kanit',sans-serif; font-weight:500; 
+    box-shadow: 0 15px 40px rgba(0,0,0,.5);
+  }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   ::-webkit-scrollbar{ width:8px; height:8px; }
   ::-webkit-scrollbar-track{ background:#0a0a0a; }
   ::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:4px; }
-  .line-clamp-2{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .marquee-wrap{ overflow:hidden; }
-  .marquee-track{ display:flex; white-space:nowrap; animation: marquee 30s linear infinite; }
-  .marquee-track span{ padding: 0 30px; flex-shrink:0; }
-  @keyframes marquee{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
-  .shipping-card{ background: var(--card); border:1.5px solid var(--line); border-radius:22px; padding:28px; transition:all .4s ease; }
-  .shipping-card:hover{ border-color:#fff; transform:translateY(-6px); }
-  .stat-card{ background: var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px; transition:all .3s ease; }
-  .stat-card:hover{ border-color:rgba(255,255,255,0.4); }
-  #zoomImage{ max-width:90vw; max-height:80vh; object-fit:contain; transition: transform .2s ease; cursor: grab; user-select:none; }
+  ::-webkit-scrollbar-thumb:hover{ background:#3a3a3a; }
+  .line-clamp-2{
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .marquee-wrap{ 
+    overflow:hidden; 
+    background: #ffffff;
+    color: #000000;
+    padding: 14px 0;
+    position: relative;
+  }
+  .marquee-track{
+    display:flex; white-space:nowrap;
+    animation: marquee 30s linear infinite;
+    font-family: 'Kanit', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+  }
+  .marquee-track span{ 
+    padding: 0 40px; 
+    flex-shrink:0; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 10px; 
+  }
+  @keyframes marquee{
+    0%{ transform:translateX(0); }
+    100%{ transform:translateX(-50%); }
+  }
+  .shipping-card{
+    background: var(--card); border:1.5px solid var(--line);
+    border-radius:22px; padding:28px; transition:all .4s cubic-bezier(.4,0,.2,1);
+    position:relative; overflow:hidden;
+  }
+  .shipping-card:hover{ border-color:#fff; transform:translateY(-6px) scale(1.02); }
+  .shipping-card::before{
+    content:''; position:absolute; top:-50%; right:-20%;
+    width:200px; height:200px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+    transition:all .5s ease;
+  }
+  .shipping-card:hover::before{ transform:scale(1.5); }
+  .stat-card{
+    background: var(--card); border:1.5px solid var(--line);
+    border-radius:18px; padding:20px; transition:all .3s ease;
+    position:relative; overflow:hidden;
+  }
+  .stat-card:hover{ border-color:rgba(255,255,255,0.4); transform:translateY(-3px); }
+  .stat-card::after{
+    content:''; position:absolute; bottom:-30px; left:-30px;
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(255,255,255,0.04);
+    transition:all .4s ease;
+  }
+  .stat-card:hover::after{ transform:scale(2); }
+  .zoom-image-wrap{
+    overflow:hidden; position:relative;
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  }
+  #zoomImage{
+    max-width:90vw; max-height:80vh; object-fit:contain;
+    transition: transform .2s ease; cursor: grab; user-select:none;
+    transform-origin: center center;
+  }
   #zoomImage:active{ cursor: grabbing; }
-  .zoom-btn{ width:46px; height:46px; border-radius:50%; border:1.5px solid #fff; background:rgba(0,0,0,.5); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; font-family:'Mali',cursive; font-weight:500; }
-  .zoom-btn:hover{ background:#fff; color:#000; }
-  .zoom-btn:disabled{ opacity:.3; cursor:not-allowed; }
+  .zoom-btn{
+    width:46px; height:46px; border-radius:50%; border:1.5px solid #fff;
+    background:rgba(0,0,0,.5); color:#fff; cursor:pointer; transition:all .25s;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    font-family:'Kanit',sans-serif; font-weight:500; backdrop-filter:blur(10px);
+  }
+  .zoom-btn:hover{ background:#fff; color:#000; transform:scale(1.1); }
+  .zoom-btn:disabled{ opacity:.3; cursor:not-allowed; transform:none; }
   .cute-dot{ width:6px; height:6px; border-radius:50%; background:#fff; display:inline-block; }
-  .back-top{ position:fixed; bottom:30px; right:30px; z-index:60; width:48px; height:48px; border-radius:50%; background:#fff; color:#000; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .3s; opacity:0; pointer-events:none; font-family:'Mali',cursive; font-weight:600; }
+  .glow-line{
+    height:1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  }
+  .back-top{
+    position:fixed; bottom:30px; right:30px; z-index:60;
+    width:48px; height:48px; border-radius:50%;
+    background:#fff; color:#000; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; transition:all .3s; opacity:0; pointer-events:none;
+    box-shadow: 0 8px 25px rgba(0,0,0,.5);
+    font-family:'Kanit',sans-serif; font-weight:600;
+  }
   .back-top.show{ opacity:1; pointer-events:auto; }
-  .back-top:hover{ transform:translateY(-5px); }
-  .img-fallback{ display:flex; align-items:center; justify-content:center; background:#0d0d0d; color:var(--muted); font-size:11px; width:100%; height:100%; }
-  .heart-float{ display:inline-block; animation: heartFloat 2s ease-in-out infinite; }
-  @keyframes heartFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
-  .section-title{ display:flex; align-items:center; gap:12px; margin-bottom:24px; }
-  .section-title .line{ flex:1; height:1px; background: linear-gradient(90deg, var(--line), transparent); }
-  .greeting-card{ background: linear-gradient(135deg, var(--card) 0%, #161616 100%); border:1.5px solid var(--line); border-radius:20px; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
-  .cute-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:20px; font-size:10px; font-weight:500; color:var(--muted); }
+  .back-top:hover{ transform:translateY(-5px) rotate(360deg); }
+  .img-fallback{
+    display:flex; align-items:center; justify-content:center;
+    background:#0d0d0d; color:var(--muted); font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase;
+    width:100%; height:100%;
+  }
+  .float-shape{
+    position:absolute; border-radius:50%; opacity:.4; pointer-events:none;
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) rotate(0); }
+    50%{ transform:translateY(-20px) rotate(180deg); }
+  }
+  .cute-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 12px; background:rgba(255,255,255,0.05);
+    border:1px solid var(--line); border-radius:20px;
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    font-weight:500; color:var(--muted);
+  }
   .cute-badge .dot{ width:6px; height:6px; border-radius:50%; background:#fff; animation: pulse 1.6s ease-in-out infinite; }
-  .loader{ width:20px; height:20px; border:2px solid var(--line); border-top-color:#fff; border-radius:50%; animation: spin 0.8s linear infinite; display:inline-block; }
-  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .sparkle{ position:absolute; pointer-events:none; }
+  @keyframes sparkle{ 
+    0%{ transform:scale(0) rotate(0); opacity:1; }
+    100%{ transform:scale(1) rotate(180deg); opacity:0; }
+  }
+  .section-title{
+    display:flex; align-items:center; gap:12px; margin-bottom:24px;
+  }
+  .section-title .line{
+    flex:1; height:1px;
+    background: linear-gradient(90deg, var(--line), transparent);
+  }
+  .section-title .line:last-child{
+    background: linear-gradient(90deg, transparent, var(--line));
+  }
+  .heart-float{
+    display:inline-block; animation: heartFloat 2s ease-in-out infinite;
+  }
+  @keyframes heartFloat{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-4px); }
+  }
+  .icon-bounce{ display:inline-block; transition:transform .3s; }
+  .product-card:hover .icon-bounce{ animation: bounce 0.6s ease infinite; }
+  @keyframes bounce{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-3px); }
+  }
+  .greeting-card{
+    background: linear-gradient(135deg, var(--card) 0%, #161616 100%);
+    border:1.5px solid var(--line); border-radius:20px; padding:20px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    flex-wrap:wrap;
+  }
+  .greeting-card:hover{ border-color:rgba(255,255,255,0.3); }
+  .loader {
+    border: 3px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    border-top: 3px solid #fff;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div class="bg-white text-black py-2 marquee-wrap" style="font-weight:500; font-size:11px;">
+<!-- MARQUEE SHIPPING BAR -->
+<div class="marquee-wrap">
   <div class="marquee-track">
     <span>📦 จัดส่งไปรษณีย์ ค่าบริการ 40฿/ออเดอร์ · ระยะเวลา 1-4 วัน</span>
     <span>🚗 จัดส่ง Grab พื้นที่ กรุงเทพฯ - ปทุมธานี · ค่าบริการตามระยะทาง</span>
@@ -101,14 +299,20 @@
   </div>
 </div>
 
+<!-- HEADER -->
 <header class="sticky top-0 z-40 bg-[#0A0A0A]/95 backdrop-blur-sm border-b border-line">
   <div class="max-w-7xl mx-auto px-5 md:px-10 py-5 flex items-center justify-between">
-    <a href="#" onclick="navigate('home');return false;" style="font-size:24px; font-weight:600; letter-spacing:.05em;">RONXZ<span class="text-muted" style="font-weight:300;"> STUDIO</span></a>
+    <a href="#" onclick="navigate('home');return false;" style="font-size:24px; font-weight:600; letter-spacing:.05em;">
+      RONXZ<span class="text-muted" style="font-weight:300;"> STUDIO</span>
+    </a>
     <nav class="hidden md:flex items-center gap-10 text-[12px] tracking-[.12em] uppercase" style="font-weight:500;">
       <a href="#" onclick="navigate('home');return false;" class="nav-link active" data-nav="home">สินค้าทั้งหมด</a>
       <a href="#" onclick="navigate('about');return false;" class="nav-link" data-nav="about">เกี่ยวกับร้าน</a>
       <a href="https://www.instagram.com/ronxz_17k/" target="_blank" class="nav-link">Instagram</a>
-      <a href="#" onclick="handleAdminClick();return false;" class="nav-link text-muted">Admin</a>
+      <button onclick="openCart()" class="nav-link relative">
+        🛒 ตะกร้า <span id="cartCount" class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center" style="display:none;">0</span>
+      </button>
+      <button id="loginBtn" onclick="handleAuthButtonClick()" class="nav-link">เข้าสู่ระบบ IG</button>
     </nav>
     <button class="md:hidden text-2xl" onclick="toggleMobileMenu()" style="background:none;border:none;color:#fff;cursor:pointer;">☰</button>
   </div>
@@ -116,17 +320,19 @@
     <a href="#" onclick="navigate('home');closeMobileMenu();return false;" class="block">สินค้าทั้งหมด</a>
     <a href="#" onclick="navigate('about');closeMobileMenu();return false;" class="block">เกี่ยวกับร้าน</a>
     <a href="https://www.instagram.com/ronxz_17k/" target="_blank" class="block">Instagram</a>
-    <a href="#" onclick="handleAdminClick();closeMobileMenu();return false;" class="block text-muted">Admin</a>
+    <a href="#" onclick="openCart();closeMobileMenu();return false;" class="block">🛒 ตะกร้าสินค้า</a>
+    <a href="#" onclick="handleAuthButtonClick();closeMobileMenu();return false;" class="block" id="loginBtnMobile">เข้าสู่ระบบ IG</a>
   </div>
 </header>
 
+<!-- HOME PAGE -->
 <main id="page-home" class="max-w-7xl mx-auto px-5 md:px-10 py-10 md:py-14">
-  <!-- ✅ ลบ "สไตล์มินิมอล" ออกแล้ว -->
   <div class="greeting-card mb-8 slide-up">
     <div class="flex items-center gap-3">
       <div style="font-size:28px;" class="heart-float">🛍️</div>
       <div>
         <div style="font-weight:500; font-size:15px;">ยินดีต้อนรับสู่ RONXZ STUDIO</div>
+        <div class="text-muted" style="font-weight:400; font-size:12px;">เสื้อผ้ามือสองคัดสภาพ</div>
       </div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
@@ -141,23 +347,23 @@
       <span class="cute-dot"></span>
       <h2 class="text-[11px] tracking-[.25em] uppercase text-muted" style="font-weight:500;">การจัดส่ง · Shipping</h2>
       <div class="line"></div>
-      <span style="font-size:14px;">💌</span>
+      <span style="font-size:14px;"></span>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="shipping-card">
-        <div class="text-4xl mb-3">📦</div>
+        <div class="text-4xl mb-3 icon-bounce">📦</div>
         <h3 class="text-lg mb-3" style="font-weight:600;">1. จัดส่งไปรษณีย์</h3>
         <div class="space-y-1.5 text-sm text-muted" style="font-weight:400;">
-          <p>💰 ค่าบริการ <span class="text-white" style="font-weight:600;">40 บาท / ออเดอร์</span></p>
-          <p>⏱️ ระยะเวลาจัดส่ง <span class="text-white" style="font-weight:600;">1 - 4 วัน</span></p>
+          <p class="flex items-center gap-2"><span>💰</span> ค่าบริการ <span class="text-white" style="font-weight:600;">40 บาท / ออเดอร์</span></p>
+          <p class="flex items-center gap-2"><span>⏱️</span> ระยะเวลาจัดส่ง <span class="text-white" style="font-weight:600;">1 - 4 วัน</span></p>
         </div>
       </div>
       <div class="shipping-card">
-        <div class="text-4xl mb-3">🚗</div>
+        <div class="text-4xl mb-3 icon-bounce">🚗</div>
         <h3 class="text-lg mb-3" style="font-weight:600;">2. จัดส่ง Grab</h3>
         <div class="space-y-1.5 text-sm text-muted" style="font-weight:400;">
-          <p>📍 พื้นที่จัดส่ง <span class="text-white" style="font-weight:600;">กรุงเทพฯ - ปทุมธานี</span></p>
-          <p>💸 ค่าบริการ <span class="text-white" style="font-weight:600;">ตามระยะทาง</span></p>
+          <p class="flex items-center gap-2"><span>📍</span> พื้นที่จัดส่ง <span class="text-white" style="font-weight:600;">กรุงเทพฯ - ปทุมธานี</span></p>
+          <p class="flex items-center gap-2"><span>💸</span> ค่าบริการ <span class="text-white" style="font-weight:600;">ตามระยะทาง</span></p>
         </div>
       </div>
     </div>
@@ -165,12 +371,13 @@
 
   <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
     <div>
-      <h1 class="text-3xl md:text-4xl" style="font-weight:500; letter-spacing:.02em;">Collection ✨</h1>
-      <p class="text-muted text-sm mt-1" style="font-weight:400;">เสื้อผ้ามือสองคัดสภาพ · Vintage & Streetwear</p>
+      <h1 class="text-3xl md:text-4xl" style="font-weight:500; letter-spacing:.02em;">Collection</h1>
+      <p class="text-muted text-sm mt-1" style="font-weight:400;">เสื้อผ้ามือสองคัดสภาพ · เสื้อผ้าวินเทจมือสอง</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap" id="filterBar">
       <button class="pill filter-btn active" data-filter="all">All</button>
       <button class="pill filter-btn" data-filter="เสื้อ">เสื้อ</button>
+            <button class="pill filter-btn" data-filter="ฮู้ดดี้">ฮู้ดดี้</button>
       <button class="pill filter-btn" data-filter="กางเกง">กางเกง</button>
       <button class="pill filter-btn" data-filter="หมวก">หมวก</button>
       <button class="pill filter-btn" data-filter="เครื่องประดับ">เครื่องประดับ</button>
@@ -179,39 +386,58 @@
     </div>
   </div>
 
-  <div id="loadingState" class="text-center py-20">
-    <div class="loader mx-auto mb-3" style="width:40px; height:40px; border-width:3px;"></div>
-    <p class="text-muted text-sm" style="font-weight:400;">กำลังโหลดสินค้า...</p>
-  </div>
-
-  <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 hidden"></div>
+  <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5"></div>
 
   <div id="emptyState" class="hidden text-center py-20 text-muted">
-    <p class="text-lg" style="font-weight:400;">🥺 ไม่มีสินค้าในหมวดนี้</p>
+    <p class="text-lg" style="font-weight:400;">ยังไม่มีสินค้า</p>
   </div>
 </main>
 
+<!-- ABOUT PAGE -->
 <section id="page-about" class="hidden max-w-4xl mx-auto px-5 md:px-10 py-16 md:py-24 fade-in">
   <h1 class="text-4xl md:text-5xl mb-8" style="font-weight:500;">About RONXZ STUDIO</h1>
   <div class="space-y-6 text-muted leading-relaxed text-[15px]" style="font-weight:400;">
-    <p>RONXZ STUDIO คือร้านคัดสรรเสื้อผ้ามือสองสไตล์ <span class="text-white" style="font-weight:500;">Vintage และ Streetwear</span></p>
-    <p>ทุกชิ้นถูกคัดเลือกด้วยความใส่ใจ ตรวจสภาพอย่างละเอียด</p>
-    <p>เราเชื่อว่าแฟชั่นที่ดีไม่จำเป็นต้องใหม่ — แต่ต้อง <span class="text-white" style="font-weight:500;">มีเรื่องราว</span></p>
+    <p> คือร้านคัดสรรเสื้อผ้ามือสองสไตล์ <span class="text-white" style="font-weight:500;">Vintage และ Streetwear</span> ที่เน้นคุณภาพ เรื่องราว และดีไซน์ที่ไม่ซ้ำใคร</p>
+    <p>ทุกชิ้นถูกคัดเลือกด้วยความใส่ใจ ตรวจสภาพอย่างละเอียด และให้คะแนนความสมบูรณ์อย่างโปร่งใส เพื่อให้คุณมั่นใจในทุกการสั่งซื้อ</p>
+    <p>เราเชื่อว่าแฟชั่นที่ดีไม่จำเป็นต้องใหม่ — แต่ต้อง <span class="text-white" style="font-weight:500;">มีเรื่องราว</span> และ <span class="text-white" style="font-weight:500;">มีสไตล์</span> ที่ยังคงอยู่</p>
     <div class="divider my-10"></div>
-    <p>ติดต่อเราได้ที่</p>
-    <a href="https://www.instagram.com/ronxz_17k/" target="_blank" class="btn btn-ig inline-flex">📷 @ronxz_17k</a>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+      <div>
+        <div class="text-3xl mb-2" style="font-weight:500;">100%</div>
+        <div class="text-[11px] tracking-[.15em] uppercase" style="font-weight:400;">คัดสภาพด้วยมือ</div>
+      </div>
+      <div>
+        <div class="text-3xl mb-2" style="font-weight:500;">9/10</div>
+        <div class="text-[11px] tracking-[.15em] uppercase" style="font-weight:400;">สภาพเฉลี่ย</div>
+      </div>
+      <div>
+        <div class="text-3xl mb-2" style="font-weight:500;">DM</div>
+        <div class="text-[11px] tracking-[.15em] uppercase" style="font-weight:400;">สั่งซื้อผ่าน Instagram</div>
+      </div>
+    </div>
+    <div class="divider my-10"></div>
+    <p>สนใจสินค้าหรือต้องการสอบถามเพิ่มเติม ติดต่อเราได้ที่</p>
+    <a href="https://www.instagram.com/user__141009/" target="_blank" class="btn btn-ig inline-flex">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
+        <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/>
+      </svg>
+      @RONXZ_17K
+    </a>
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer class="border-t border-line mt-20">
   <div class="max-w-7xl mx-auto px-5 md:px-10 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] tracking-[.12em] uppercase text-muted" style="font-weight:400;">
-    <div>© 2025 RONXZ STUDIO — All Rights Reserved</div>
+    <div>© 2026 RONXZ STUDIO </div>
     <div>Vintage · Streetwear · Secondhand</div>
   </div>
 </footer>
 
+<!-- BACK TO TOP -->
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+<!-- PRODUCT DETAIL MODAL -->
 <div id="productModal" class="modal" onclick="if(event.target===this) closeModal()">
   <div class="bg-[#0A0A0A] max-w-6xl w-full max-h-[92vh] overflow-y-auto border border-line" style="border-radius:22px;">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -221,47 +447,108 @@
           <div id="soldTagModal" class="hidden absolute top-4 right-4 bg-red-600 text-white px-3 py-1 text-[10px] tracking-[.2em] uppercase" style="border-radius:8px; font-weight:500;">Sold Out</div>
         </div>
         <div class="flex gap-2 mt-4 overflow-x-auto pb-2" id="thumbList"></div>
-        <p class="text-center text-[10px] text-muted mt-2" style="font-weight:400;">🔍 คลิกที่รูปเพื่อซูม</p>
+        <p class="text-center text-[10px] text-muted tracking-[.08em] mt-2" style="font-weight:400;">🔍 คลิกที่รูปเพื่อซูมดูรายละเอียด</p>
       </div>
       <div class="p-6 md:p-10 flex flex-col">
-        <button onclick="closeModal()" class="self-end text-muted text-2xl leading-none mb-4 hover:text-white" style="font-weight:300; background:none; border:none; cursor:pointer;">×</button>
+        <button onclick="closeModal()" class="self-end text-muted text-2xl leading-none mb-4 hover:text-white hover:rotate-90 transition" style="font-weight:300; background:none; border:none; cursor:pointer; transition:all .3s;">×</button>
         <div class="text-[10px] tracking-[.25em] uppercase text-muted mb-3" id="modalCategory" style="font-weight:500;"></div>
         <h1 class="text-2xl md:text-3xl mb-3" id="modalName" style="font-weight:500; line-height:1.3;"></h1>
         <div class="flex items-center gap-4 mb-5">
           <div class="text-2xl" id="modalPrice" style="font-weight:500;"></div>
-          <div class="text-[10px] text-muted flex items-center gap-1" id="modalViews" style="font-weight:400;"></div>
+          <div class="text-[10px] tracking-[.05em] text-muted flex items-center gap-1" id="modalViews" style="font-weight:400;"></div>
         </div>
         <div class="divider mb-5"></div>
         <div class="space-y-3 text-sm" style="font-weight:400;">
-          <div class="flex justify-between border-b border-line pb-2"><span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">สถานะ</span><span id="modalStatus" class="text-[10px] tracking-[.15em] uppercase" style="font-weight:500;"></span></div>
-          <div class="flex justify-between border-b border-line pb-2"><span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">ไซส์</span><span id="modalSize"></span></div>
-          <div class="flex justify-between border-b border-line pb-2"><span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">สภาพ</span><span id="modalCondition"></span></div>
-          <div class="flex justify-between border-b border-line pb-2"><span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">ตำหนิ</span><span id="modalFlaw" class="text-right max-w-[60%]"></span></div>
+          <div class="flex justify-between border-b border-line pb-2">
+            <span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">สถานะ</span>
+            <span id="modalStatus" class="text-[10px] tracking-[.15em] uppercase" style="font-weight:500;"></span>
+          </div>
+          <div class="flex justify-between border-b border-line pb-2">
+            <span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">ไซส์</span>
+            <span id="modalSize"></span>
+          </div>
+          <div class="flex justify-between border-b border-line pb-2">
+            <span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">สภาพ</span>
+            <span id="modalCondition"></span>
+          </div>
+          <div class="flex justify-between border-b border-line pb-2">
+            <span class="text-muted text-[10px] tracking-[.15em] uppercase" style="font-weight:500;">ตำหนิ</span>
+            <span id="modalFlaw" class="text-right max-w-[60%]"></span>
+          </div>
         </div>
         <div class="mt-5">
           <div class="text-[10px] tracking-[.15em] uppercase text-muted mb-2" style="font-weight:500;">รายละเอียด</div>
           <p class="text-sm text-muted leading-relaxed" id="modalDesc" style="font-weight:400;"></p>
         </div>
         <div class="mt-auto pt-8">
-          <button id="orderBtn" onclick="orderViaInstagram()" class="btn btn-ig w-full" style="border-radius:16px;">📷 สั่งซื้อผ่าน Instagram</button>
+          <div class="flex gap-3">
+            <button id="addCartBtn" onclick="addToCart()" class="btn flex-1" style="border-radius:16px;">🛒 ใส่ตะกร้า</button>
+            <button id="orderBtn" onclick="orderViaInstagram()" class="btn btn-ig flex-1" style="border-radius:16px;">📷 ซื้อชิ้นนี้</button>
+          </div>
+          <p class="text-center text-[10px] tracking-[.1em] uppercase text-muted mt-3" style="font-weight:400;">กดสั่งซื้อเพื่อเปิด DM ของเรา</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ZOOM MODAL -->
 <div id="zoomModal" class="modal" onclick="if(event.target===this) closeZoom()">
-  <button onclick="closeZoom()" class="absolute top-5 right-5 text-white text-3xl z-10" style="background:none; border:none; cursor:pointer;">×</button>
+  <button onclick="closeZoom()" class="absolute top-5 right-5 text-white text-3xl z-10 hover:rotate-90 transition" style="font-weight:300; background:none; border:none; cursor:pointer; transition:all .3s;">×</button>
   <div class="absolute bottom-6 left-1/2 z-10 flex items-center gap-3" style="transform:translateX(-50%);">
     <button class="zoom-btn" id="zoomOut" onclick="zoomOut()">−</button>
     <button class="zoom-btn" onclick="zoomReset()" style="font-size:14px;">⟲</button>
     <button class="zoom-btn" id="zoomIn" onclick="zoomIn()">+</button>
   </div>
-  <div style="overflow:hidden;position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+  <div class="zoom-image-wrap">
     <img id="zoomImage" src="" alt="" />
   </div>
 </div>
 
+<!-- IG LOGIN MODAL -->
+<div id="igLoginModal" class="modal" onclick="if(event.target===this) closeIgLogin()">
+  <div class="bg-[#0A0A0A] border border-line max-w-md w-full p-8 relative" style="border-radius:22px;">
+    <button onclick="closeIgLogin()" class="absolute top-4 right-4 text-muted text-2xl leading-none hover:text-white" style="background:none;border:none;cursor:pointer;">×</button>
+    <div class="text-center mb-6">
+      <div class="text-4xl mb-2"></div>
+      <h2 class="text-2xl" style="font-weight:500;">เข้าสู่ระบบด้วย Instagram</h2>
+      <p class="text-muted text-sm mt-2" style="font-weight:400;">ใส่ Username Instagram ของคุณ<br>เพื่อเข้าสู่ระบบและซื้อสินค้า</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">IG Username</label>
+        <input type="text" id="igUsernameInput" placeholder="●●●●●" autocomplete="off" />
+      </div>
+      <button onclick="submitIgLogin()" class="btn btn-ig w-full mt-2">เข้าสู่ระบบ</button>
+      <p class="text-[10px] text-muted text-center" style="font-weight:400;">* ไม่ต้องใส่รหัสผ่าน เพื่อความปลอดภัยของคุณ</p>
+    </div>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div id="cartModal" class="modal" onclick="if(event.target===this) closeCart()">
+  <div class="bg-[#0A0A0A] border border-line max-w-lg w-full p-8 relative max-h-[90vh] overflow-y-auto" style="border-radius:22px;">
+    <button onclick="closeCart()" class="absolute top-4 right-4 text-muted text-2xl leading-none hover:text-white" style="background:none;border:none;cursor:pointer;">×</button>
+    <div class="mb-6">
+      <h2 class="text-2xl" style="font-weight:500;">🛒 ตะกร้าสินค้า</h2>
+      <div class="divider mt-3"></div>
+    </div>
+    <div id="cartItems" class="space-y-4"></div>
+    <div id="cartEmpty" class="text-center py-10 text-muted">
+      <p class="text-lg" style="font-weight:400;">🛒 ตะกร้ายังว่างเปล่า</p>
+      <p class="text-sm mt-2" style="font-weight:400;">เพิ่มสินค้าที่คุณสนใจสั่งซื้อได้เลย!</p>
+    </div>
+    <div id="cartFooter" class="hidden mt-8">
+      <div class="flex justify-between items-center mb-6 p-4 bg-card border border-line" style="border-radius:14px;">
+        <span class="text-[10px] tracking-[.15em] uppercase text-muted" style="font-weight:500;">รวมทั้งหมด</span>
+        <span class="text-2xl" id="cartTotal" style="font-weight:500;">฿0</span>
+      </div>
+      <button onclick="checkoutCart()" class="btn btn-ig w-full" style="border-radius:16px;">ส่งรายการสั่งซื้อผ่าน IG</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
 <div id="adminLogin" class="modal" onclick="if(event.target===this) closeAdminLogin()">
   <div class="bg-[#0A0A0A] border border-line max-w-md w-full p-8" style="border-radius:22px;">
     <div class="text-center mb-6">
@@ -271,19 +558,20 @@
     </div>
     <div class="space-y-4">
       <div>
-        <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">📧 Email</label>
-        <input type="email" id="adminEmail" placeholder="admin@ronxz.com" autocomplete="off" />
+        <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">👤 Username</label>
+        <input type="text" id="adminUser" placeholder="admin" autocomplete="off" />
       </div>
       <div>
         <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">🔑 Password</label>
         <input type="password" id="adminPass" placeholder="••••••" />
       </div>
-      <button onclick="adminLogin()" id="adminLoginBtn" class="btn btn-solid w-full mt-2">✨ เข้าสู่ระบบ</button>
-      <p class="text-[10px] text-muted text-center" style="font-weight:400;">Email: admin@ronxz.com</p>
+      <button onclick="adminLogin()" class="btn btn-solid w-full mt-2">✨ เข้าสู่ระบบ</button>
+      <p class="text-[10px] text-muted text-center" style="font-weight:400;">Default: admin / ronxz2025</p>
     </div>
   </div>
 </div>
 
+<!-- ADMIN PANEL -->
 <div id="adminPanel" class="hidden fixed inset-0 z-50 bg-[#0A0A0A] overflow-y-auto">
   <div class="max-w-7xl mx-auto px-5 md:px-10 py-8">
     <div class="flex items-center justify-between mb-6">
@@ -292,64 +580,124 @@
         <p class="text-muted text-sm mt-1" style="font-weight:400;">จัดการสินค้าและดูสถิติ</p>
       </div>
       <div class="flex gap-2">
-        <button onclick="logoutAdmin()" class="btn text-[10px] px-3 py-2" style="border-radius:12px;">👋 Logout</button>
+        <button onclick="exportData()" class="btn text-[10px] px-3 py-2" style="border-radius:12px;">📥 Export</button>
+        <button onclick="logoutAdmin()" class="btn text-[10px] px-3 py-2" style="border-radius:12px;">Logout</button>
       </div>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">📦 สินค้าทั้งหมด</div><div class="text-3xl" id="statTotal" style="font-weight:500;">0</div></div>
-      <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">✨ พร้อมขาย</div><div class="text-3xl text-green-400" id="statAvailable" style="font-weight:500;">0</div></div>
-      <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">💔 ขายแล้ว</div><div class="text-3xl text-red-400" id="statSold" style="font-weight:500;">0</div></div>
-      <div class="stat-card"><div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">👁 ยอดเข้าชม</div><div class="text-3xl" id="statViews" style="font-weight:500;">0</div></div>
+      <div class="stat-card">
+        <div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">📦 สินค้าทั้งหมด</div>
+        <div class="text-3xl" id="statTotal" style="font-weight:500;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">✨ พร้อมขาย</div>
+        <div class="text-3xl text-green-400" id="statAvailable" style="font-weight:500;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">💔 ขายแล้ว</div>
+        <div class="text-3xl text-red-400" id="statSold" style="font-weight:500;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-[10px] tracking-[.15em] uppercase text-muted mb-1" style="font-weight:500;">👁 ยอดเข้าชม</div>
+        <div class="text-3xl" id="statViews" style="font-weight:500;">0</div>
+      </div>
+    </div>
+
+    <div class="bg-card border border-line p-4 mb-6" style="border-radius:18px; border-width:1.5px;">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="cute-dot"></span>
+        <h3 class="text-sm" style="font-weight:500;">🔥 สินค้ายอดนิยม (Top 3)</h3>
+      </div>
+      <div id="topViewed" class="space-y-2"></div>
     </div>
 
     <div class="bg-card border border-line p-6 md:p-8 mb-8" style="border-radius:22px; border-width:1.5px;">
       <h2 class="text-lg mb-6" id="formTitle" style="font-weight:500;">✨ เพิ่มสินค้าใหม่</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ชื่อสินค้า *</label><input type="text" id="pName" placeholder="เช่น Vintage Carhartt" /></div>
-        <div><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">หมวดหมู่ *</label><select id="pCategory"><option value="เสื้อ">เสื้อ</option><option value="กางเกง">กางเกง</option><option value="หมวก">หมวก</option><option value="เครื่องประดับ">เครื่องประดับ</option></select></div>
-        <div><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ราคา (บาท) *</label><input type="number" id="pPrice" placeholder="1290" /></div>
-        <div><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">สถานะ</label><select id="pStatus"><option value="available">พร้อมขาย</option><option value="sold">ขายแล้ว</option></select></div>
-        <div><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ไซส์</label><input type="text" id="pSize" placeholder="M / L / XL" /></div>
-        <div><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">สภาพ</label><input type="text" id="pCondition" placeholder="9/10" /></div>
-        <div class="md:col-span-2"><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ตำหนิ</label><input type="text" id="pFlaw" placeholder="ไม่มี" /></div>
-        <div class="md:col-span-2"><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">รายละเอียด</label><textarea id="pDesc" rows="3"></textarea></div>
-        <div class="md:col-span-2"><label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">รูปสินค้า (URL หลายรูป คั่นบรรทัด)</label><textarea id="pImageUrls" rows="2" placeholder="https://i.imgur.com/xxx.jpg"></textarea><div id="imagePreview" class="flex gap-2 mt-3 flex-wrap"></div></div>
+        <div>
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ชื่อสินค้า *</label>
+          <input type="text" id="pName" placeholder="เช่น Vintage Carhartt Jacket" />
+        </div>
+        <div>
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">หมวดหมู่ *</label>
+          <select id="pCategory">
+            <option value="เสื้อ">เสื้อ</option>
+            <option value="กางเกง">กางเกง</option>
+            <option value="หมวก">หมวก</option>
+            <option value="เครื่องประดับ">เครื่องประดับ</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ราคา (บาท) *</label>
+          <input type="number" id="pPrice" placeholder="เช่น 1290" />
+        </div>
+        <div>
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">สถานะ</label>
+          <select id="pStatus">
+            <option value="available">พร้อมขาย (AVAILABLE)</option>
+            <option value="sold">ขายแล้ว (SOLD OUT)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ไซส์</label>
+          <input type="text" id="pSize" placeholder="M / L / XL / W32" />
+        </div>
+        <div>
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">สภาพสินค้า</label>
+          <input type="text" id="pCondition" placeholder="9/10" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">ตำหนิ (ถ้าไม่มีใส่ "ไม่มี")</label>
+          <input type="text" id="pFlaw" placeholder="เช่น รอยเปื้อนเล็กน้อยที่แขน, รอยถลอกที่คอเสื้อ, ไม่มี" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">รายละเอียดสินค้า</label>
+          <textarea id="pDesc" rows="3" placeholder="อธิบายรายละเอียดสินค้า เช่น ของแท้ สภาพดี ผ้าหนา"></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-[10px] tracking-[.15em] uppercase text-muted block mb-2" style="font-weight:500;">รูปสินค้า (URL หลายรูป คั่นด้วยบรรทัดใหม่)</label>
+          <textarea id="pImageUrls" rows="2" placeholder="https://i.imgur.com/xxx.jpg&#10;https://i.imgur.com/yyy.jpg"></textarea>
+          <div class="text-[10px] text-muted mt-1" style="font-weight:400;">💡 แนะนำใช้ลิงก์รูปภาพ เช่น Imgur, Google Drive (สาธารณะ), หรือ URL รูปตรงๆ</div>
+          <div id="imagePreview" class="flex gap-2 mt-3 flex-wrap"></div>
+        </div>
       </div>
       <div class="flex gap-3 mt-6">
-        <button onclick="saveProduct()" id="saveProductBtn" class="btn btn-solid" style="border-radius:14px;">💾 บันทึกสินค้า</button>
+        <button onclick="saveProduct()" class="btn btn-solid" style="border-radius:14px;">💾 บันทึกสินค้า</button>
         <button onclick="resetForm()" class="btn" style="border-radius:14px;">ยกเลิก</button>
       </div>
     </div>
 
-    <div class="mb-4"><h2 class="text-lg" style="font-weight:500;">📦 สินค้าทั้งหมด (<span id="adminCount">0</span>)</h2></div>
+    <div class="mb-4 flex items-center gap-2">
+      <span class="cute-dot"></span>
+      <h2 class="text-lg" style="font-weight:500;">📦 สินค้าทั้งหมด (<span id="adminCount">0</span>)</h2>
+    </div>
     <div id="adminList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </div>
 </div>
 
+<!-- TOAST -->
 <div id="toast" class="toast"></div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAHfkknk8XynqS6P9whg8Pax1oXDU01Qjc",
-  authDomain: "ronxz-studio.firebaseapp.com",
-  projectId: "ronxz-studio",
-  storageBucket: "ronxz-studio.firebasestorage.app",
-  messagingSenderId: "883061099891",
-  appId: "1:883061099891:web:a9fb01efd653a45ce7c906"
-};
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const INSTAGRAM_URL = 'https://www.instagram.com/user__141009/';
+const ADMIN_USER = 'dev';
+const ADMIN_PASS = 'dev';
+const STORAGE_KEY = 'ronxz_products_v3';
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+// ใส่ SheetDB API URL ของคุณที่นี่
+const SHEETDB_URL = 'https://sheetdb.io/api/v1/6cmplhdsy3ibq'; //
+const CARTS_API = 'https://sheetdb.io/api/v1/aaf0m77sx8b60'; // 
+const USE_API = SHEETDB_URL !== '';
 
-const INSTAGRAM_URL = 'https://www.instagram.com/ronxz_17k/';
 let products = [];
 let editingId = null;
 let newImageUrls = [];
 let currentFilter = 'all';
-let currentUser = null;
-let isFirstLoad = true; // 🔥 ป้องกันกระพริบ
+let currentProductId = null;
 
 let zoomState = { scale: 1, x: 0, y: 0 };
 let zoomDragging = false;
@@ -357,83 +705,84 @@ let zoomStart = { x: 0, y: 0 };
 let zoomOrigin = { x: 0, y: 0 };
 
 const defaultProducts = [
-  { name:'Vintage Carhartt Detroit Jacket', price:1890, status:'available', category:'เสื้อ', size:'L', condition:'9/10', flaw:'ไม่มี', desc:'แจ็คเก็ต Carhartt Detroit สีน้ำตาล ผ้า Duck Canvas หนา', images:['https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800'], views:0 },
-  { name:'Dickies 874 Original', price:1290, status:'available', category:'กางเกง', size:'W32 L32', condition:'9/10', flaw:'ไม่มี', desc:'กางเกง Dickies 874 สีดำ ของแท้', images:['https://images.unsplash.com/photo-1542272604-787c3835535d?w=800'], views:0 },
-  { name:'Stüssy World Tour Tee', price:990, status:'available', category:'เสื้อ', size:'M', condition:'8/10', flaw:'สีซีดเล็กน้อย', desc:'เสื้อยืด Stüssy World Tour', images:['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800'], views:0 },
-  { name:'Nike Dad Cap', price:590, status:'available', category:'หมวก', size:'Free', condition:'8/10', flaw:'ไม่มี', desc:'หมวกแก๊ป Nike สีดำ', images:['https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800'], views:0 },
-  { name:'Silver Chain Necklace', price:390, status:'available', category:'เครื่องประดับ', size:'50cm', condition:'9/10', flaw:'ไม่มี', desc:'สร้อยคอเงิน Stainless', images:['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800'], views:0 }
+  { id:'p1', name:'Vintage Carhartt Detroit Jacket', price:1890, status:'available', category:'เสื้อ', size:'L', condition:'9/10', flaw:'ไม่มี', desc:'แจ็คเก็ต Carhartt Detroit สีน้ำตาล ผ้า Duck Canvas หนา สภาพสวยมาก ป้ายครบ ของแท้ USA', images:['https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800','https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800'], views:0 },
+  { id:'p2', name:'Dickies 874 Original', price:1290, status:'available', category:'กางเกง', size:'W32 L32', condition:'9/10', flaw:'รอยถลอกเล็กน้อยที่กระเป๋าหลัง', desc:'กางเกง Dickies 874 สีดำ ของแท้ ผ้า Twill แข็ง ทรงสวย ใส่สบาย', images:['https://images.unsplash.com/photo-1542272604-787c3835535d?w=800'], views:0 },
+  { id:'p3', name:'Stüssy World Tour Tee', price:990, status:'available', category:'เสื้อ', size:'M', condition:'8/10', flaw:'สีซีดเล็กน้อยตามการใช้งาน', desc:'เสื้อยืด Stüssy World Tour ลายคลาสสิก ผ้านุ่ม สีไม่ซีด', images:['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800'], views:0 },
+  { id:'p4', name:'Carhartt Cargo Pant', price:1590, status:'sold', category:'กางเกง', size:'W30 L32', condition:'9/10', flaw:'ไม่มี', desc:'กางเกงคาร์โก้ Carhartt สีเขียวทหาร ใส่ทนทาน สภาพดี', images:['https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800'], views:0 },
+  { id:'p5', name:'Nike Dad Cap', price:590, status:'available', category:'หมวก', size:'Free', condition:'8/10', flaw:'สีซีดเล็กน้อยที่ขอบหมวก', desc:'หมวกแก๊ป Nike สีดำ โลโก้ปักเดิม ปรับขนาดได้', images:['https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800'], views:0 },
+  { id:'p6', name:'Silver Chain Necklace', price:390, status:'available', category:'เครื่องประดับ', size:'50cm', condition:'9/10', flaw:'ไม่มี', desc:'สร้อยคอเงิน Stainless สไตล์มินิมอล ไม่ดำ ใส่ได้ทุกวัน', images:['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800'], views:0 },
+  { id:'p7', name:'Champion Reverse Weave Hoodie', price:1490, status:'available', category:'เสื้อ', size:'XL', condition:'9/10', flaw:'รอยขนแมวเล็กน้อยที่แขน', desc:'ฮู้ด Champion Reverse Weave สีเทา ของแท้ USA ผ้าหนา อุ่น', images:['https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800'], views:0 },
+  { id:'p8', name:"Levi's 501 Vintage", price:1790, status:'sold', category:'กางเกง', size:'W32 L34', condition:'8/10', flaw:'รอยฟาดที่เข่าซ้าย', desc:"ยีนส์ Levi's 501 ของแท้ ผ้า Denim หนา ฟาดสวย", images:['https://images.unsplash.com/photo-1604176354204-9268737828e4?w=800'], views:0 }
 ];
 
-// 🔥 แก้บัคกระพริบ: render เฉพาะตอนมีการเปลี่ยนแปลงจริง
-function listenProducts(){
-  db.collection('products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
-    products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    if(products.length === 0 && snapshot.metadata.fromCache === false){ addDefaultProducts(); return; }
-    document.getElementById('loadingState').classList.add('hidden');
-    
-    // เช็คว่ามีการเพิ่ม/ลบ สินค้าจริงมั้ย (ไม่ใช่แค่ views เปลี่ยน)
-    const hasStructureChange = snapshot.docChanges().some(change => 
-      change.type === 'added' || change.type === 'removed'
-    );
-    
-    // render เฉพาะครั้งแรก หรือมีการเพิ่ม/ลบ
-    if(isFirstLoad || hasStructureChange){
-      renderProducts();
-      isFirstLoad = false;
+// ============================================================
+// DATA HANDLING
+// ============================================================
+async function loadProducts(){
+  if(USE_API){
+    try {
+      const res = await fetch(SHEETDB_URL);
+      if(!res.ok) throw new Error('API Error');
+      let data = await res.json();
+      products = data.map(p => ({
+        id: String(p.id),
+        name: p.name || '',
+        price: Number(p.price) || 0,
+        status: p.status || 'available',
+        category: p.category || 'เสื้อ',
+        size: p.size || '-',
+        condition: p.condition || '-',
+        flaw: p.flaw || '-',
+        desc: p.desc || '',
+        images: p.images ? p.images.split('\n').map(u => u.trim()).filter(u => u) : [],
+        views: Number(p.views) || 0
+      }));
+    } catch (error) {
+      console.error('Load API failed, using local:', error);
+      showToast('⚠️ โหลดข้อมูลออนไลน์ไม่สำเร็จ ใช้ข้อมูลตัวอย่างแทน');
+      loadLocalProducts();
     }
-    
-    if(!document.getElementById('adminPanel').classList.contains('hidden')){
-      renderAdminList(); updateStats();
+  } else {
+    loadLocalProducts();
+  }
+  renderProducts();
+  if(!document.getElementById('adminPanel').classList.contains('hidden')){
+    renderAdminList();
+    updateStats();
+    renderTopViewed();
+  }
+}
+
+function loadLocalProducts(){
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if(stored){
+    try {
+      products = JSON.parse(stored);
+      products.forEach(p => {
+        if(typeof p.views !== 'number') p.views = 0;
+        if(!p.flaw) p.flaw = '-';
+      });
+    } catch(e){
+      products = defaultProducts;
+      saveLocalProducts();
     }
-  }, (error) => {
-    console.error('Firestore error:', error);
-    showToast('❌ ' + error.message);
-    document.getElementById('loadingState').innerHTML = '<div class="text-center max-w-md mx-auto p-4"><div class="text-5xl mb-3">😢</div><p class="text-muted text-sm">เชื่อมต่อ Firebase ไม่สำเร็จ</p><p class="text-[10px] text-muted mt-2">'+error.message+'</p></div>';
-  });
+  } else {
+    products = defaultProducts;
+    saveLocalProducts();
+  }
 }
 
-async function addDefaultProducts(){
-  const batch = db.batch();
-  defaultProducts.forEach(p => {
-    const ref = db.collection('products').doc();
-    batch.set(ref, { ...p, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  });
-  await batch.commit();
+function saveLocalProducts(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  } catch(e){
+    showToast('⚠️ พื้นที่จัดเก็บเต็ม กรุณาลบสินค้าเก่า');
+  }
 }
 
-async function saveProductToDB(data){
-  if(editingId){ await db.collection('products').doc(editingId).update(data); }
-  else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); data.views = 0; await db.collection('products').add(data); }
-}
-
-async function deleteProductFromDB(id){ await db.collection('products').doc(id).delete(); }
-async function incrementView(id){ await db.collection('products').doc(id).update({ views: firebase.firestore.FieldValue.increment(1) }); }
-
-function handleAdminClick(){ if(currentUser) openAdminPanel(); else openAdminLogin(); }
-
-function openAdminLogin(){ document.getElementById('adminLogin').classList.add('open'); document.body.style.overflow = 'hidden'; }
-function closeAdminLogin(){ document.getElementById('adminLogin').classList.remove('open'); document.body.style.overflow = ''; document.getElementById('adminEmail').value = ''; document.getElementById('adminPass').value = ''; }
-
-function adminLogin(){
-  const email = document.getElementById('adminEmail').value.trim();
-  const pass = document.getElementById('adminPass').value;
-  const btn = document.getElementById('adminLoginBtn');
-  if(!email || !pass){ showToast('⚠️ กรุณากรอก Email และ Password'); return; }
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> กำลังเข้าสู่ระบม...';
-  auth.signInWithEmailAndPassword(email, pass).then((uc) => { currentUser = uc.user; closeAdminLogin(); openAdminPanel(); showToast('✨ เข้าสู่ระบมสำเร็จ'); btn.disabled = false; btn.innerHTML = '✨ เข้าสู่ระบม'; }).catch((error) => {
-    let msg = '❌ เข้าสู่ระบมไม่สำเร็จ';
-    if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') msg = '❌ Email หรือ Password ไม่ถูกต้อง';
-    if(error.code === 'auth/user-not-found') msg = '❌ ไม่พบผู้ใช้นี้';
-    showToast(msg); btn.disabled = false; btn.innerHTML = '✨ เข้าสู่ระบม';
-  });
-}
-document.getElementById('adminPass').addEventListener('keypress', (e)=>{ if(e.key === 'Enter') adminLogin(); });
-
-function openAdminPanel(){ document.getElementById('adminPanel').classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderAdminList(); updateStats(); }
-function logoutAdmin(){ auth.signOut(); currentUser = null; document.getElementById('adminPanel').classList.add('hidden'); document.body.style.overflow = ''; showToast('👋 ออกจากระบบแล้ว'); }
-
-auth.onAuthStateChanged((user) => { currentUser = user; });
-
+// ============================================================
+// NAVIGATION & UI
+// ============================================================
 function navigate(page){
   document.getElementById('page-home').classList.toggle('hidden', page!=='home');
   document.getElementById('page-about').classList.toggle('hidden', page!=='about');
@@ -442,30 +791,47 @@ function navigate(page){
   if(active) active.classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});
 }
+
 function toggleMobileMenu(){ document.getElementById('mobileMenu').classList.toggle('hidden'); }
 function closeMobileMenu(){ document.getElementById('mobileMenu').classList.add('hidden'); }
 
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// RENDER PRODUCTS
+// ============================================================
 function renderProducts(){
   const grid = document.getElementById('productGrid');
   const empty = document.getElementById('emptyState');
   let list = [...products];
+  
   if(currentFilter === 'available') list = list.filter(p => p.status === 'available');
   else if(currentFilter === 'sold') list = list.filter(p => p.status === 'sold');
   else if(currentFilter !== 'all') list = list.filter(p => p.category === currentFilter);
-  if(list.length === 0){ grid.innerHTML = ''; grid.classList.add('hidden'); empty.classList.remove('hidden'); return; }
-  empty.classList.add('hidden'); grid.classList.remove('hidden');
+  
+  if(list.length === 0){
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  
   grid.innerHTML = list.map((p, i) => `
-    <div class="product-card bg-card border border-line fade-in cursor-pointer" style="animation-delay:${i*0.04}s; border-width:1.5px;" onclick="openProduct('${p.id}')">
+    <div class="product-card bg-card border border-line fade-in cursor-pointer ${p.status === 'sold' ? 'grayscale' : ''}" style="animation-delay:${i*0.04}s; border-width:1.5px;" onclick="openProduct('${p.id}')">
       <div class="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
-        <img src="${(p.images && p.images[0]) || 'https://via.placeholder.com/400x500/111/444?text=No+Image'}" alt="${p.name}" class="product-img w-full h-full object-cover" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-fallback\\'>No Image</div>'" />
-        ${p.status === 'sold' ? `<div class="sold-overlay"><div class="bg-red-600 text-white px-4 py-1.5 text-[10px] tracking-[.2em] uppercase" style="border-radius:8px; font-weight:500;">Sold Out</div></div>` : ''}
-        ${p.images && p.images.length > 1 ? `<div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-0.5" style="border-radius:6px;">+${p.images.length-1}</div>` : ''}
+        <img src="${p.images[0] || ''}" alt="${p.name}" class="product-img w-full h-full object-cover" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-fallback\\'>No Image</div>'" />
+        ${p.images.length > 1 ? `<div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-0.5" style="border-radius:6px; font-weight:400;">+${p.images.length-1}</div>` : ''}
       </div>
       <div class="p-3.5">
         <div class="text-[9px] tracking-[.2em] uppercase text-muted mb-1" style="font-weight:500;">${p.category}</div>
         <h3 class="text-[13px] leading-snug mb-2 line-clamp-2 min-h-[2.5em]" style="font-weight:500;">${p.name}</h3>
         <div class="flex items-center justify-between">
-          <div class="text-[15px]" style="font-weight:500;">฿${(p.price||0).toLocaleString()}</div>
+          <div class="text-[15px]" style="font-weight:500;">฿${p.price.toLocaleString()}</div>
           <div class="text-[9px] tracking-[.12em] uppercase ${p.status==='available'?'text-green-400 pulse-dot':'text-muted'}" style="font-weight:500;">${p.status==='available'?'● Available':'○ Sold'}</div>
         </div>
       </div>
@@ -477,44 +843,108 @@ document.getElementById('filterBar').addEventListener('click', (e)=>{
   const btn = e.target.closest('.filter-btn');
   if(!btn) return;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); currentFilter = btn.dataset.filter; renderProducts();
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  renderProducts();
 });
 
-async function openProduct(id){
+// ============================================================
+// PRODUCT MODAL
+// ============================================================
+function openProduct(id){
   const p = products.find(x => x.id === id);
   if(!p) return;
-  incrementView(id).catch(err => console.warn(err));
+  
+  currentProductId = id; // เก็บ ID สำหรับระบบตะกร้า
+  
+  p.views = (p.views || 0) + 1;
+  if(USE_API) {
+    updateViewsAPI(p.id, p.views);
+  } else {
+    saveLocalProducts();
+  }
+  
   document.getElementById('modalCategory').textContent = p.category;
   document.getElementById('modalName').textContent = p.name;
-  document.getElementById('modalPrice').textContent = '฿' + (p.price||0).toLocaleString();
-  document.getElementById('modalStatus').innerHTML = p.status==='available' ? '<span class="text-green-400">● AVAILABLE</span>' : '<span class="text-red-400">● SOLD OUT</span>';
+  document.getElementById('modalPrice').textContent = '฿' + p.price.toLocaleString();
+  document.getElementById('modalStatus').innerHTML = p.status==='available'
+    ? '<span class="text-green-400">● AVAILABLE</span>'
+    : '<span class="text-red-400">● SOLD OUT</span>';
   document.getElementById('modalSize').textContent = p.size || '-';
   document.getElementById('modalCondition').textContent = p.condition || '-';
   document.getElementById('modalFlaw').textContent = p.flaw || '-';
   document.getElementById('modalDesc').textContent = p.desc || '';
-  document.getElementById('modalViews').innerHTML = `<span>👁</span><span>${(p.views||0) + 1} views</span>`;
-  const imgs = p.images && p.images.length > 0 ? p.images : ['https://via.placeholder.com/600x750/111/333?text=No+Image'];
-  document.getElementById('mainImage').src = imgs[0];
+  document.getElementById('modalViews').innerHTML = `<span>👁</span><span>${p.views} views</span>`;
+  
+  const main = document.getElementById('mainImage');
+  main.src = p.images[0] || '';
+  // ทำภาพหลักให้ขาวดำถ้าขายแล้ว
+  main.classList.toggle('grayscale', p.status === 'sold');
+  
   document.getElementById('soldTagModal').classList.toggle('hidden', p.status!=='sold');
+  
+  // ล็อคปุ่มซื้อชิ้นนี้
   document.getElementById('orderBtn').disabled = p.status==='sold';
   document.getElementById('orderBtn').style.opacity = p.status==='sold' ? '0.4' : '1';
-  document.getElementById('thumbList').innerHTML = imgs.map((img, i) => `<div class="thumb w-16 h-16 md:w-20 md:h-20 border ${i===0?'active border-white':'border-line'} overflow-hidden flex-shrink-0" style="border-width:1.5px;" onclick="changeImage('${img}', this)"><img src="${img}" class="w-full h-full object-cover" /></div>`).join('');
-  document.getElementById('productModal').classList.add('open'); document.body.style.overflow = 'hidden';
-}
-function closeModal(){ document.getElementById('productModal').classList.remove('open'); document.body.style.overflow = ''; }
-function changeImage(src, el){
-  document.getElementById('mainImage').src = src;
-  document.querySelectorAll('.thumb').forEach(t => { t.classList.remove('active','border-white'); t.classList.add('border-line'); });
-  el.classList.add('active','border-white'); el.classList.remove('border-line');
-}
-function orderViaInstagram(){
-  const name = document.getElementById('modalName').textContent;
-  const price = document.getElementById('modalPrice').textContent;
-  const text = encodeURIComponent(`สวัสดีครับ สนใจสินค้า: ${name} (${price}) ครับ`);
-  window.open(`${INSTAGRAM_URL}?text=${text}`, '_blank');
+  document.getElementById('orderBtn').style.cursor = p.status==='sold' ? 'not-allowed' : 'pointer';
+  
+  // ล็อคปุ่มใส่ตะกร้าด้วย
+  const addCartBtn = document.getElementById('addCartBtn');
+  addCartBtn.disabled = p.status==='sold';
+  addCartBtn.style.opacity = p.status==='sold' ? '0.4' : '1';
+  addCartBtn.style.cursor = p.status==='sold' ? 'not-allowed' : 'pointer';
+  
+  const thumbList = document.getElementById('thumbList');
+  thumbList.innerHTML = p.images.map((img, i) => `
+    <div class="thumb w-16 h-16 md:w-20 md:h-20 border ${i===0?'active border-white':'border-line'} overflow-hidden flex-shrink-0" style="border-width:1.5px;" onclick="changeImage('${img}', this)">
+      <img src="${img}" class="w-full h-full object-cover" />
+    </div>
+  `).join('');
+  
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-function openZoom(){ document.getElementById('zoomImage').src = document.getElementById('mainImage').src; zoomReset(); document.getElementById('zoomModal').classList.add('open'); }
+function closeModal(){
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function changeImage(src, el){
+  document.getElementById('mainImage').src = src;
+  document.querySelectorAll('.thumb').forEach(t => { 
+    t.classList.remove('active','border-white'); 
+    t.classList.add('border-line'); 
+  });
+  el.classList.add('active','border-white');
+  el.classList.remove('border-line');
+}
+
+// ฟังก์ชันสั่งซื้อสินค้าชิ้นเดียว
+async function orderViaInstagram(){
+  const p = products.find(x => x.id === currentProductId);
+  if(!p) return;
+  
+  const message = `สวัสดีครับ สนใจสินค้า: ${p.name} (฿${p.price.toLocaleString()}) ครับ`;
+  
+  try {
+    await navigator.clipboard.writeText(message);
+    showToast('📋 คัดลอกข้อความแล้ว! กำลังเปิด IG ให้วางในแช็ต');
+  } catch (e) {
+    showToast('⚠️ กรุณาคัดลอกข้อความเอง');
+  }
+  
+  window.open(INSTAGRAM_URL, '_blank');
+}
+
+// ============================================================
+// ZOOM FUNCTIONS
+// ============================================================
+function openZoom(){
+  document.getElementById('zoomImage').src = document.getElementById('mainImage').src;
+  zoomReset();
+  document.getElementById('zoomModal').classList.add('open');
+}
 function closeZoom(){ document.getElementById('zoomModal').classList.remove('open'); }
 function zoomIn(){ zoomState.scale = Math.min(5, zoomState.scale + 0.5); applyZoom(); }
 function zoomOut(){ zoomState.scale = Math.max(1, zoomState.scale - 0.5); if(zoomState.scale === 1){ zoomState.x = 0; zoomState.y = 0; } applyZoom(); }
@@ -525,15 +955,97 @@ function applyZoom(){
   document.getElementById('zoomIn').disabled = zoomState.scale >= 5;
   document.getElementById('zoomOut').disabled = zoomState.scale <= 1;
 }
-const zoomImg = document.getElementById('zoomImage');
-zoomImg.addEventListener('mousedown', (e) => { if(zoomState.scale <= 1) return; zoomDragging = true; zoomStart = { x: e.clientX, y: e.clientY }; zoomOrigin = { x: zoomState.x, y: zoomState.y }; e.preventDefault(); });
-document.addEventListener('mousemove', (e) => { if(!zoomDragging) return; zoomState.x = zoomOrigin.x + (e.clientX - zoomStart.x); zoomState.y = zoomOrigin.y + (e.clientY - zoomStart.y); zoomImg.style.transform = `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`; });
-document.addEventListener('mouseup', () => { zoomDragging = false; });
-document.getElementById('zoomModal').addEventListener('wheel', (e) => { if(!document.getElementById('zoomModal').classList.contains('open')) return; e.preventDefault(); if(e.deltaY < 0) zoomIn(); else zoomOut(); }, { passive: false });
-let touchDist = 0;
-zoomImg.addEventListener('touchstart', (e) => { if(e.touches.length === 2){ touchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); } });
-zoomImg.addEventListener('touchmove', (e) => { if(e.touches.length === 2){ e.preventDefault(); const newDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); if(touchDist > 0){ const delta = newDist - touchDist; if(Math.abs(delta) > 5){ if(delta > 0) zoomIn(); else zoomOut(); touchDist = newDist; } } } }, { passive: false });
 
+const zoomImg = document.getElementById('zoomImage');
+zoomImg.addEventListener('mousedown', (e) => {
+  if(zoomState.scale <= 1) return;
+  zoomDragging = true;
+  zoomStart = { x: e.clientX, y: e.clientY };
+  zoomOrigin = { x: zoomState.x, y: zoomState.y };
+  e.preventDefault();
+});
+document.addEventListener('mousemove', (e) => {
+  if(!zoomDragging) return;
+  zoomState.x = zoomOrigin.x + (e.clientX - zoomStart.x);
+  zoomState.y = zoomOrigin.y + (e.clientY - zoomStart.y);
+  document.getElementById('zoomImage').style.transform = `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`;
+});
+document.addEventListener('mouseup', () => { zoomDragging = false; });
+document.getElementById('zoomModal').addEventListener('wheel', (e) => {
+  if(!document.getElementById('zoomModal').classList.contains('open')) return;
+  e.preventDefault();
+  if(e.deltaY < 0) zoomIn(); else zoomOut();
+}, { passive: false });
+let touchDist = 0;
+zoomImg.addEventListener('touchstart', (e) => {
+  if(e.touches.length === 2){
+    touchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  }
+});
+zoomImg.addEventListener('touchmove', (e) => {
+  if(e.touches.length === 2){
+    e.preventDefault();
+    const newDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    if(touchDist > 0){
+      const delta = newDist - touchDist;
+      if(Math.abs(delta) > 5){
+        if(delta > 0) zoomIn(); else zoomOut();
+        touchDist = newDist;
+      }
+    }
+  }
+}, { passive: false });
+
+// ============================================================
+// ADMIN AUTH & SECRET URL
+// ============================================================
+function checkSecretAdminAccess() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('admin')) {
+    setTimeout(() => { openAdminLogin(); }, 500);
+  }
+}
+function openAdminLogin(){
+  document.getElementById('adminLogin').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAdminLogin(){
+  document.getElementById('adminLogin').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+  if (window.location.search.includes('admin')) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+function adminLogin(){
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value;
+  if(u === ADMIN_USER && p === ADMIN_PASS){
+    closeAdminLogin();
+    openAdminPanel();
+    showToast('✨ เข้าสู่ระบบสำเร็จ');
+  } else {
+    showToast('❌ Username หรือ Password ไม่ถูกต้อง');
+  }
+}
+document.getElementById('adminPass').addEventListener('keypress', (e)=>{ if(e.key === 'Enter') adminLogin(); });
+
+function openAdminPanel(){
+  document.getElementById('adminPanel').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  loadProducts();
+  showToast(USE_API ? '☁️ เชื่อมต่อกับ Google Sheets แล้ว' : '💾 ใช้ข้อมูลในเครื่อง (Local)');
+}
+function logoutAdmin(){
+  document.getElementById('adminPanel').classList.add('hidden');
+  document.body.style.overflow = '';
+  showToast('ออกจากระบบแล้ว');
+}
+
+// ============================================================
+// ADMIN DASHBOARD
+// ============================================================
 function updateStats(){
   const total = products.length;
   const available = products.filter(p => p.status === 'available').length;
@@ -545,75 +1057,476 @@ function updateStats(){
   document.getElementById('statViews').textContent = views;
 }
 
+function renderTopViewed(){
+  const sorted = [...products].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,3);
+  const container = document.getElementById('topViewed');
+  if(sorted.length === 0 || (sorted[0].views||0) === 0){
+    container.innerHTML = '<p class="text-muted text-xs" style="font-weight:400;">ยังไม่มีข้อมูลการเข้าชม</p>';
+    return;
+  }
+  container.innerHTML = sorted.map((p, i) => `
+    <div class="flex items-center gap-3 p-2 hover:bg-white/5 transition" style="border-radius:12px;">
+      <div class="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-xs" style="font-weight:600;">${i+1}</div>
+      <img src="${p.images[0] || ''}" class="w-10 h-10 object-cover bg-[#0d0d0d]" style="border-radius:8px;" onerror="this.src='https://via.placeholder.com/40/111/444?text=?'" />
+      <div class="flex-1 min-w-0">
+        <div class="text-xs truncate" style="font-weight:500;">${p.name}</div>
+        <div class="text-[10px] text-muted" style="font-weight:400;">${p.category} · ฿${p.price.toLocaleString()}</div>
+      </div>
+      <div class="text-xs text-muted" style="font-weight:500;">👁 ${p.views||0}</div>
+    </div>
+  `).join('');
+}
+
 function renderAdminList(){
   const list = document.getElementById('adminList');
   document.getElementById('adminCount').textContent = products.length;
   list.innerHTML = products.map(p => `
     <div class="bg-card border border-line p-4 flex gap-3" style="border-radius:16px; border-width:1.5px;">
-      <img src="${(p.images && p.images[0]) || 'https://via.placeholder.com/80x96/111/444?text=?'}" class="w-20 h-24 object-cover bg-[#0d0d0d]" style="border-radius:10px;" />
+      <img src="${p.images[0] || ''}" class="w-20 h-24 object-cover bg-[#0d0d0d]" style="border-radius:10px;" onerror="this.src='https://via.placeholder.com/80x96/111/444?text=?'" />
       <div class="flex-1 min-w-0">
         <div class="text-[9px] tracking-[.15em] uppercase text-muted" style="font-weight:500;">${p.category}</div>
         <div class="text-[13px] truncate" style="font-weight:500;">${p.name}</div>
-        <div class="text-[13px] mt-0.5" style="font-weight:500;">฿${(p.price||0).toLocaleString()}</div>
-        <div class="text-[9px] tracking-[.12em] uppercase mt-0.5 ${p.status==='available'?'text-green-400':'text-red-400'}" style="font-weight:500;">${p.status==='available'?'● Available':'● Sold'}</div>
+        <div class="text-[13px] mt-0.5" style="font-weight:500;">฿${p.price.toLocaleString()}</div>
+        <div class="flex items-center gap-3 mt-0.5">
+          <div class="text-[9px] tracking-[.12em] uppercase ${p.status==='available'?'text-green-400':'text-red-400'}" style="font-weight:500;">${p.status==='available'?'● Available':'● Sold'}</div>
+          <div class="text-[9px] text-muted" style="font-weight:400;">👁 ${p.views||0}</div>
+        </div>
         <div class="flex gap-2 mt-2.5">
-          <button onclick="editProduct('${p.id}')" class="text-[10px] tracking-[.08em] uppercase border border-line px-3 py-1 hover:bg-white hover:text-black" style="border-radius:10px; font-weight:500; background:transparent; color:#fff; cursor:pointer;">✏️ แก้ไข</button>
-          <button onclick="deleteProduct('${p.id}')" class="text-[10px] tracking-[.08em] uppercase border px-3 py-1" style="border-color:#7f1d1d; color:#f87171; border-radius:10px; font-weight:500; background:transparent; cursor:pointer;" onmouseover="this.style.background='#dc2626';this.style.color='#fff';" onmouseout="this.style.background='';this.style.color='#f87171';">🗑 ลบ</button>
+          <button onclick="editProduct('${p.id}')" class="text-[10px] tracking-[.08em] uppercase border border-line px-3 py-1 hover:bg-white hover:text-black transition" style="border-radius:10px; font-weight:500; background:transparent; color:#fff; cursor:pointer;">✏️ แก้ไข</button>
+          <button onclick="deleteProduct('${p.id}')" class="text-[10px] tracking-[.08em] uppercase border px-3 py-1 transition" style="border-color:#7f1d1d; color:#f87171; border-radius:10px; font-weight:500; background:transparent; cursor:pointer;" onmouseover="this.style.background='#dc2626';this.style.color='#fff';this.style.borderColor='#dc2626';" onmouseout="this.style.background='';this.style.color='#f87171';this.style.borderColor='#7f1d1d';">🗑 ลบ</button>
         </div>
       </div>
     </div>
   `).join('');
 }
 
-document.getElementById('pImageUrls').addEventListener('input', (e) => { newImageUrls = e.target.value.split('\n').map(u => u.trim()).filter(u => u); renderImagePreview(); });
+document.getElementById('pImageUrls').addEventListener('input', (e) => {
+  const urls = e.target.value.split('\n').map(u => u.trim()).filter(u => u);
+  newImageUrls = urls;
+  renderImagePreview();
+});
+
 function renderImagePreview(){
   const preview = document.getElementById('imagePreview');
-  const urls = newImageUrls.length > 0 ? newImageUrls : (editingId ? (products.find(p=>p.id===editingId)?.images || []) : []);
-  preview.innerHTML = urls.map(url => `<div class="relative w-20 h-20 border border-line overflow-hidden" style="border-radius:10px; border-width:1.5px;"><img src="${url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'img-fallback\\' style=\\'font-size:9px\\'>error</div>'" /></div>`).join('');
+  if(newImageUrls.length === 0 && !editingId){
+    preview.innerHTML = '';
+    return;
+  }
+  const urls = newImageUrls.length > 0 ? newImageUrls : (editingId ? (products.find(p=>p.id===editingId).images || []) : []);
+  preview.innerHTML = urls.map((url, i) => `
+    <div class="relative w-20 h-20 border border-line overflow-hidden" style="border-radius:10px; border-width:1.5px;">
+      <img src="${url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'img-fallback\\' style=\\'font-size:9px\\'>error</div>'" />
+    </div>
+  `).join('');
 }
 
 async function saveProduct(){
   const name = document.getElementById('pName').value.trim();
   const price = parseInt(document.getElementById('pPrice').value);
-  if(!name || !price || isNaN(price)){ showToast('⚠️ กรุณากรอกชื่อและราคา'); return; }
-  const btn = document.getElementById('saveProductBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> กำลังบันทึก...';
-  const finalImages = newImageUrls.length > 0 ? newImageUrls : (editingId ? (products.find(p=>p.id===editingId).images || []) : ['https://via.placeholder.com/600x750/111/333?text=No+Image']);
-  const data = { name, price, category: document.getElementById('pCategory').value, status: document.getElementById('pStatus').value, size: document.getElementById('pSize').value.trim() || '-', condition: document.getElementById('pCondition').value.trim() || '-', flaw: document.getElementById('pFlaw').value.trim() || 'ไม่มี', desc: document.getElementById('pDesc').value.trim(), images: finalImages };
-  try { await saveProductToDB(data); showToast(editingId ? '✅ แก้ไขสินค้าเรียบร้อย' : '✅ เพิ่มสินค้าเรียบร้อย'); resetForm(); } catch(err){ console.error(err); showToast('❌ ' + err.message); } finally { btn.disabled = false; btn.innerHTML = '💾 บันทึกสินค้า'; }
+  const category = document.getElementById('pCategory').value;
+  const status = document.getElementById('pStatus').value;
+  
+  if(!name || !price || isNaN(price)){
+    showToast('⚠️ กรุณากรอกชื่อและราคา');
+    return;
+  }
+  
+  let finalImages = [];
+  if(newImageUrls.length > 0){
+    finalImages = newImageUrls;
+  } else if(editingId){
+    finalImages = products.find(p=>p.id===editingId).images;
+  } else {
+    finalImages = ['https://via.placeholder.com/600x750/111/333?text=No+Image'];
+  }
+  
+  const payload = {
+    name, price: Number(price), category, status,
+    size: document.getElementById('pSize').value.trim() || '-',
+    condition: document.getElementById('pCondition').value.trim() || '-',
+    flaw: document.getElementById('pFlaw').value.trim() || 'ไม่มี',
+    desc: document.getElementById('pDesc').value.trim(),
+    images: finalImages.join('\n') 
+  };
+  
+  const saveBtn = document.querySelector('button[onclick="saveProduct()"]');
+  const originalText = saveBtn.innerHTML;
+  saveBtn.innerHTML = '<span class="loader"></span> กำลังบันทึก...';
+  saveBtn.disabled = true;
+
+  try {
+    if(USE_API){
+      if(editingId){
+        await fetch(`${SHEETDB_URL}/id/${editingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        showToast('✅ แก้ไขสินค้าเรียบร้อย (ออนไลน์)');
+      } else {
+        payload.id = 'p' + Date.now();
+        payload.views = 0;
+        await fetch(SHEETDB_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        showToast('✅ เพิ่มสินค้าเรียบร้อย (ออนไลน์)');
+      }
+    } else {
+      if(editingId){
+        const idx = products.findIndex(p => p.id === editingId);
+        payload.images = finalImages;
+        products[idx] = { ...products[idx], ...payload };
+        showToast('✅ แก้ไขสินค้าเรียบร้อย (Local)');
+      } else {
+        payload.id = 'p' + Date.now();
+        payload.views = 0;
+        payload.images = finalImages;
+        products.unshift(payload);
+        showToast('✅ เพิ่มสินค้าเรียบร้อย (Local)');
+      }
+      saveLocalProducts();
+    }
+    resetForm();
+    await loadProducts();
+  } catch (error) {
+    console.error(error);
+    showToast('⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+  } finally {
+    saveBtn.innerHTML = originalText;
+    saveBtn.disabled = false;
+  }
 }
 
 function editProduct(id){
-  const p = products.find(x => x.id === id); if(!p) return;
+  const p = products.find(x => x.id === id);
+  if(!p) return;
   editingId = id;
   document.getElementById('formTitle').textContent = '✏️ แก้ไขสินค้า';
-  document.getElementById('pName').value = p.name || '';
-  document.getElementById('pCategory').value = p.category || 'เสื้อ';
-  document.getElementById('pPrice').value = p.price || '';
-  document.getElementById('pStatus').value = p.status || 'available';
+  document.getElementById('pName').value = p.name;
+  document.getElementById('pCategory').value = p.category;
+  document.getElementById('pPrice').value = p.price;
+  document.getElementById('pStatus').value = p.status;
   document.getElementById('pSize').value = p.size || '';
   document.getElementById('pCondition').value = p.condition || '';
   document.getElementById('pFlaw').value = p.flaw || '';
   document.getElementById('pDesc').value = p.desc || '';
   document.getElementById('pImageUrls').value = (p.images || []).join('\n');
-  newImageUrls = []; renderImagePreview(); window.scrollTo({top:0, behavior:'smooth'});
+  newImageUrls = [];
+  renderImagePreview();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
-async function deleteProduct(id){ if(!confirm('ต้องการลบสินค้านี้หรือไม่?')) return; try { await deleteProductFromDB(id); showToast('🗑 ลบสินค้าเรียบร้อย'); } catch(err){ showToast('❌ ' + err.message); } }
+async function deleteProduct(id){
+  if(!confirm('ต้องการลบสินค้านี้หรือไม่?')) return;
+  if(USE_API){
+    try {
+      await fetch(`${SHEETDB_URL}/id/${id}`, { method: 'DELETE' });
+      showToast('🗑 ลบสินค้าเรียบร้อย (ออนไลน์)');
+      await loadProducts();
+    } catch (error) {
+      showToast('⚠️ ลบไม่สำเร็จ กรุณาลองอีกครั้ง');
+    }
+  } else {
+    products = products.filter(p => p.id !== id);
+    saveLocalProducts();
+    renderAdminList();
+    renderProducts();
+    updateStats();
+    renderTopViewed();
+    showToast('🗑 ลบสินค้าเรียบร้อย (Local)');
+  }
+}
+
+async function updateViewsAPI(id, views){
+  try {
+    await fetch(`${SHEETDB_URL}/id/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ views: Number(views) })
+    });
+  } catch (error) {
+    console.error('Failed to update views');
+  }
+}
 
 function resetForm(){
   editingId = null;
   document.getElementById('formTitle').textContent = '✨ เพิ่มสินค้าใหม่';
   ['pName','pPrice','pSize','pCondition','pFlaw','pDesc','pImageUrls'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('imagePreview').innerHTML = ''; newImageUrls = [];
+  document.getElementById('imagePreview').innerHTML = '';
+  newImageUrls = [];
 }
 
-function showToast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+function exportData(){
+  const data = JSON.stringify(products, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ronxz-products.json';
+  a.click();
+  showToast('📥 Export สำเร็จ');
+}
 
-document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ closeModal(); closeZoom(); closeAdminLogin(); } });
-window.addEventListener('scroll', () => { document.getElementById('backTop').classList.toggle('show', window.scrollY > 400); });
+// ============================================================
+// IG LOGIN & CART SYSTEM (เชื่อมต่อ Google Sheets แบบข้ามเครื่อง)
+// ============================================================
+let cart = JSON.parse(localStorage.getItem('ronxz_cart')) || [];
+let igUser = localStorage.getItem('ronxz_ig_user') || null;
 
-listenProducts();
+function updateAuthUI() {
+  const cartCount = document.getElementById('cartCount');
+  cartCount.textContent = cart.length;
+  cartCount.style.display = cart.length > 0 ? 'flex' : 'none';
+  
+  const btn = document.getElementById('loginBtn');
+  const btnM = document.getElementById('loginBtnMobile');
+  if(igUser) {
+    if(btn) btn.innerHTML = 'สวัสดี (' + igUser + ')';
+    if(btnM) btnM.textContent = 'สวัสดี (' + igUser + ')';
+  } else {
+    if(btn) btn.innerHTML = 'เข้าสู่ระบบ IG';
+    if(btnM) btnM.textContent = 'เข้าสู่ระบบ IG';
+  }
+}
+
+function handleAuthButtonClick() {
+  if(igUser) {
+    if(confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+      igUser = null;
+      cart = []; // ล้างตะกร้าในเครื่องด้วยเมื่อออกจากระบบ
+      localStorage.removeItem('ronxz_ig_user');
+      localStorage.removeItem('ronxz_cart');
+      showToast('ออกจากระบบแล้ว');
+      updateAuthUI();
+    }
+  } else {
+    openIgLogin();
+  }
+}
+
+function openIgLogin() {
+  document.getElementById('igLoginModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeIgLogin() {
+  document.getElementById('igLoginModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ฟังก์ชันล็อคอิน (ดึงตะกร้าจากเซิร์ฟเวอร์มาแสดง)
+async function submitIgLogin() {
+  let username = document.getElementById('igUsernameInput').value.trim();
+  if (username.startsWith('@')) username = username.substring(1);
+  const igRegex = /^[A-Za-z0-9_.]+$/;
+
+  if (!username || !igRegex.test(username)) {
+    showToast('❌ ชื่อผู้ใช้ IG ไม่ถูกต้อง');
+    return;
+  }
+
+  igUser = username;
+  localStorage.setItem('ronxz_ig_user', igUser);
+  closeIgLogin();
+  updateAuthUI();
+  showToast('✨ กำลังเข้าสู่ระบบและดึงข้อมูลตะกร้า...');
+
+  // ไปดึงตะกร้าจาก Google Sheets
+ try {
+    // ค้นหาว่ามีชื่อนี้ในระบบแล้วหรือยัง
+    const res = await fetch(`${CARTS_API}/search?igusername=${encodeURIComponent(igUser)}`);
+    const data = await res.json();
+    
+    if (data.length > 0) {
+      // ถ้าเคยมีตะกร้าในระบบ ให้นำมาใส่ในเครื่อง
+      cart = data[0].cart ? data[0].cart.split(',').filter(id => id) : [];
+    } else {
+      // ถ้าไม่เคยมี ให้สร้างแถวใหม่ใน Sheet (กำหนด id เป็น timestamp)
+      cart = [];
+      await fetch(CARTS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id: 'cart_' + Date.now(), 
+          igusername: igUser, 
+          cart: '' 
+        })
+      });
+    }
+    localStorage.setItem('ronxz_cart', JSON.stringify(cart));
+    updateAuthUI();
+    showToast('✨ เข้าสู่ระบบด้วย IG สำเร็จ! ยินดีต้อนรับ @' + igUser);
+  } catch (error) {
+    showToast('⚠️ ไม่สามารถดึงข้อมูลตะกร้าออนไลน์ได้');
+  }
+}
+
+// ฟังก์ชันซิงค์ตะกร้าไปที่เซิร์ฟเวอร์ (ค้นหาก่อน แล้วค่อยอัปเดต)
+async function syncCartToServer() {
+  if (!igUser) return; // ถ้ายังไม่ล็อคอิน ไม่ต้องซิงค์
+  try {
+    // 1. ค้นหาแถวของผู้ใช้คนนี้ก่อน
+    const res = await fetch(`${CARTS_API}/search?igusername=${encodeURIComponent(igUser)}`);
+    const data = await res.json();
+    
+    if (data.length > 0) {
+      // 2. ถ้าเจอแถว ให้อัปเดตด้วย id ของแถวนั้น (ปลอดภัยที่สุด ไม่มี Error 400)
+      const rowId = data[0].id;
+      await fetch(`${CARTS_API}/id/${rowId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart: cart.join(',') })
+      });
+    } else {
+      // 3. ถ้ายังไม่มีแถว (อาจจะโดนลบไป) ให้สร้างใหม่
+      await fetch(CARTS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id: 'cart_' + Date.now(), 
+          igusername: igUser, 
+          cart: cart.join(',') 
+        })
+      });
+    }
+  } catch (error) {
+    console.error('Failed to sync cart:', error);
+  }
+}
+// เพิ่มสินค้าลงตะกร้า
+async function addToCart() {
+  if(!currentProductId) return;
+  
+  // เช็คก่อนว่าสินค้าหมดหรือไม่
+  const p = products.find(x => x.id === currentProductId);
+  if(p && p.status === 'sold') {
+    showToast('⚠️ สินค้าชิ้นนี้ขายหมดแล้ว');
+    return;
+  }
+
+  if(!igUser) {
+    showToast('⚠️ กรุณาเข้าสู่ระบบด้วย IG ก่อน');
+    openIgLogin();
+    return;
+  }
+  cart.push(currentProductId);
+  localStorage.setItem('ronxz_cart', JSON.stringify(cart));
+  showToast('🛒 เพิ่มสินค้าลงตะกร้าแล้ว');
+  updateAuthUI();
+  closeModal();
+  await syncCartToServer(); // ส่งข้อมูลขึ้นเซิร์ฟเวอร์
+}
+
+function openCart() {
+  renderCart();
+  document.getElementById('cartModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCart() {
+  document.getElementById('cartModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const empty = document.getElementById('cartEmpty');
+  const footer = document.getElementById('cartFooter');
+  
+  if(cart.length === 0) {
+    container.innerHTML = '';
+    empty.classList.remove('hidden');
+    footer.classList.add('hidden');
+    return;
+  }
+  
+  empty.classList.add('hidden');
+  footer.classList.remove('hidden');
+  
+  let total = 0;
+  container.innerHTML = cart.map((id, index) => {
+    const p = products.find(x => x.id === id);
+    if(!p) return '';
+    total += p.price;
+    return `
+      <div class="flex gap-3 items-center bg-card p-3 border border-line" style="border-radius:14px;">
+        <img src="${p.images[0] || ''}" class="w-16 h-16 object-cover bg-[#0d0d0d]" style="border-radius:10px;" />
+        <div class="flex-1 min-w-0">
+          <div class="text-sm truncate" style="font-weight:500;">${p.name}</div>
+          <div class="text-sm text-muted" style="font-weight:400;">฿${p.price.toLocaleString()}</div>
+        </div>
+        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-900" style="border-radius:8px;">ลบ</button>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
+}
+
+// ลบสินค้าออกจากตะกร้า
+async function removeFromCart(index) {
+  cart.splice(index, 1);
+  localStorage.setItem('ronxz_cart', JSON.stringify(cart));
+  renderCart();
+  updateAuthUI();
+  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
+  await syncCartToServer(); // ส่งข้อมูลขึ้นเซิร์ฟเวอร์
+}
+
+// สั่งซื้อทั้งตะกร้า (ล้างตะกร้าหลังสั่งซื้อ)
+async function checkoutCart() {
+  if(cart.length === 0) return;
+  
+  let message = `สวัสดีครับ สนใจสั่งซื้อสินค้ารายการนี้ครับ:\n`;
+  let total = 0;
+  
+  cart.forEach((id, i) => {
+    const p = products.find(x => x.id === id);
+    if(p) {
+      message += `\n${i+1}. ${p.name} - ฿${p.price.toLocaleString()}`;
+      total += p.price;
+    }
+  });
+  
+  message += `\n\nรวมทั้งหมด: ฿${total.toLocaleString()}\n\nพร้อมชำระเงินครับ 🙏`;
+  
+  try {
+    await navigator.clipboard.writeText(message);
+    showToast('📋 คัดลอกรายการแล้ว! กำลังเปิด IG ให้วางในแช็ต');
+  } catch (e) {
+    showToast('⚠️ กรุณาคัดลอกรายการเอง');
+  }
+
+  // ล้างตะกร้าทั้งในเครื่องและบนเซิร์ฟเวอร์
+  cart = [];
+  localStorage.setItem('ronxz_cart', JSON.stringify(cart));
+  await syncCartToServer(); 
+  updateAuthUI();
+  closeCart();
+  
+  window.open(INSTAGRAM_URL, '_blank');
+}
+
+// ============================================================
+// EVENT LISTENERS & INIT
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    closeModal(); closeZoom(); closeAdminLogin(); closeIgLogin(); closeCart();
+  }
+});
+
+window.addEventListener('scroll', () => {
+  document.getElementById('backTop').classList.toggle('show', window.scrollY > 400);
+});
+
+// INIT
+loadProducts();
+checkSecretAdminAccess();
+updateAuthUI();
 </script>
 </body>
 </html>
